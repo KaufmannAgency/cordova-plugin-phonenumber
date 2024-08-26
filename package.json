@@ -1,0 +1,32 @@
+{
+  "name": "cordova-plugin-phonenumber",
+  "version": "0.0.1",
+  "description": "Query own phone number from SIM-card.",
+  "cordova": {
+    "id": "cordova-plugin-phonenumber",
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KaufmannAgency/cordova-plugin-phonenumber.git"
+  },
+  "keywords": [
+    "Phone",
+    "NHG",
+    "cordova-android"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.0.0"
+    }
+  ],
+  "author": "Joni Rinne <joni.rinne@nhg.fi>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/KaufmannAgency/cordova-plugin-phonenumber/issues"
+  },
+  "homepage": "https://github.com/KaufmannAgency/cordova-plugin-phonenumber"
+}

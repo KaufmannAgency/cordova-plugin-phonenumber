@@ -1,0 +1,44 @@
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+  id="cordova-plugin-phonenumber"
+  version="0.0.1">
+
+    <name>Cordova Phonenumber</name>
+ 
+    <description>
+        Query own phone number from SIM-card.
+	</description>
+
+    <engines>
+        <engine name="cordova" version=">=3.0.0" />
+    </engines>
+
+    <repo>https://github.com/KaufmannAgency/cordova-plugin-phonenumber.git</repo>
+
+    <keywords>cordova,phonegap,sso,imprivata</keywords>
+
+    <js-module src="www/phonenumber.js" name="PhonenumberPlugin">
+        <clobbers target="cordovaPhonenumber" />
+    </js-module>
+
+	<platform name="android">
+        
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+            <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
+        </config-file>
+
+        <framework src="src/android/phonenumber.gradle" custom="true" type="gradleReference" />
+
+	    <config-file target="config.xml" parent="/*">
+	        <feature name="CordovaPhonenumber">
+	            <param name="android-package" value="fi.nhg.paketti.cordova.plugin.CordovaPhonenumber"/>
+	            <param name="onload" value="true" />
+	        </feature>
+	    </config-file>
+
+	    <source-file src="src/android/CordovaPhonenumber.java" target-dir="fi/nhg/paketti/cordova/plugin" />
+        
+	</platform>
+
+</plugin>
