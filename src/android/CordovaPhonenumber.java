@@ -7,8 +7,8 @@ import android.util.Base64;
 
 import android.telephony.SubscriptionManager;
 import android.telephony.SubscriptionInfo;
-// import android.content.Context;
-// import android.telephony.TelephonyManager;
+import android.content.Context;
+import android.telephony.TelephonyManager;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
@@ -52,27 +52,47 @@ public class CordovaPhonenumber extends CordovaPlugin {
 
     private void resolveTelephone() {
 
-        // Provides the number (fails silently if no permissions).
+        // SubscriptionManager provides the number (fails silently if no permissions).        
         SubscriptionManager subscriptionManager = SubscriptionManager.from(this.cordova.getActivity().getApplicationContext());
         List<SubscriptionInfo> subsInfoList = subscriptionManager.getActiveSubscriptionInfoList();
-        Log.d(LOG_TAG, "Current telephony subscription list = " + subsInfoList);
+        Log.i(LOG_TAG, "Current telephony subscription list = " + subsInfoList);
         for (SubscriptionInfo subscriptionInfo : subsInfoList) {
-            String number = subscriptionInfo.getNumber();
-            Log.i(LOG_TAG, "Founc subscription number:  " + number);
-            if(number != null && !number.isEmpty()) {
-                mPhone = number.replace("+358", "0");
-                Log.i(LOG_TAG, "mPhone set to:  " + mPhone);
-                break;
+            // String number = subscriptionInfo.getNumber(); // This method was deprecated in API level 33. 
+            final String number = subscriptionManager.getPhoneNumber(subscriptionInfo.getSubscriptionId());
+            Log.i(LOG_TAG, "Got subscription number (using SubscriptionManager#getPhoneNumber): " + number);
+            if(number == null || number.isEmpty()) {
+                Log.i(LOG_TAG, " Number is null or empty.");
+                continue;
+            } else {
+                mPhone = number.replace("+358", "0"); // PhoneNumberUtils.formatNumberToE164()
+                Log.i(LOG_TAG, " Number exist, mPhone set to: " + mPhone);
+                break;                
             }
         }
-        if(mPhone == null)
-            Log.i(LOG_TAG, "No telephony number found. Make sure SIM-card is installed and application has sufficient permissions");
 
-        // Also provides the number but throws exception if no permissions.
-        // TelephonyManager phoneMgr = (TelephonyManager) this.cordova.getActivity().getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
-        // Log.d(LOG_TAG, "[LINE NUMBER] -----------> getPhoneNumber(): " + phoneMgr.getLine1Number());
+        // As a fallback TelephonyManager provides the number (throws exception if no permissions). This method was deprecated in API level 33. 
+        if(mPhone == null) {
+            Log.i(LOG_TAG, "Finding using TelephonyManager#getLine1Number as a fallback.");
+            try {
+                TelephonyManager phoneMgr = (TelephonyManager)this.cordova.getActivity().getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+                final String number = phoneMgr.getLine1Number();
+                Log.i(LOG_TAG, "Got phone number (using TelephonyManager#getLine1Number): " + number);
+                if(number == null || number.isEmpty()) {
+                    Log.i(LOG_TAG, " Number is null or empty.");
+                } else {
+                    mPhone = number.replace("+358", "0"); // PhoneNumberUtils.formatNumberToE164()
+                    Log.i(LOG_TAG, " Number exist, mPhone set to: " + mPhone);
+                }
+            } catch (Throwable t) {
+                Log.i(LOG_TAG, "Exception when finding number (using elephonyManager#getLine1Number):", t);
+            }
+        }
+
+        // Finally give up.
+        if(mPhone == null) {
+            Log.i(LOG_TAG, "No telephony number found. Make sure SIM-card is installed and application has sufficient permissions. Abort.");
+        }
     }
-    
 
     /**
       * CVD command interface.
